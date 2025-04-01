@@ -1,35 +1,13 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torch.utils.data import DataLoader, Dataset
-import torchvision
-from torchvision import transforms
+from torch.utils.data import Dataset, DataLoader
+import torchvision.transforms as transforms
+from torchvision.utils import save_image
 from PIL import Image
 import os
-from torchvision.utils import save_image  # PyTorch function to save image
 
-# Placeholder for an image dataset class
-class ImageDataset(Dataset):
-    def __init__(self, image_paths, transform=None):
-        self.image_paths = image_paths
-        self.transform = transform
-
-    def __len__(self):
-        return len(self.image_paths)
-
-    def __getitem__(self, idx):
-        image = Image.open(self.image_paths[idx])
-        if self.transform:
-            image = self.transform(image)
-        return image
-
-# Example transformation for image pre-processing
-transform = transforms.Compose([
-    transforms.Resize((128, 128)),
-    transforms.ToTensor(),
-])
-
-# Placeholder for a simple Encoder and Decoder (VAE-like architecture)
+# Encoder Model
 class Encoder(nn.Module):
     def __init__(self):
         super(Encoder, self).__init__()
@@ -46,6 +24,7 @@ class Encoder(nn.Module):
         z = self.fc2(x)
         return z
 
+# Decoder Model
 class Decoder(nn.Module):
     def __init__(self):
         super(Decoder, self).__init__()
@@ -62,7 +41,7 @@ class Decoder(nn.Module):
         x = torch.sigmoid(self.deconv2(x))  # output image
         return x
 
-# Define a simple model structure combining Encoder and Decoder
+# Full Model combining Encoder and Decoder
 class MultiDecoderModel(nn.Module):
     def __init__(self):
         super(MultiDecoderModel, self).__init__()
@@ -79,10 +58,31 @@ class MultiDecoderModel(nn.Module):
         else:
             raise ValueError("Unknown style")
 
+# Dataset for loading images
+class ImageDataset(Dataset):
+    def __init__(self, image_paths, transform=None):
+        self.image_paths = image_paths
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.image_paths)
+
+    def __getitem__(self, idx):
+        image = Image.open(self.image_paths[idx])
+        if self.transform:
+            image = self.transform(image)
+        return image
+
+# Transformation for image preprocessing
+transform = transforms.Compose([
+    transforms.Resize((128, 128)),
+    transforms.ToTensor(),
+])
+
 # Assuming image paths are already available
 image_paths = ['1.jpg', '2.jpg']  # Modify as per your paths
 
-# Create the dataset and data loader
+# Create dataset and dataloader
 dataset = ImageDataset(image_paths, transform)
 data_loader = DataLoader(dataset, batch_size=2, shuffle=True)
 
@@ -123,7 +123,7 @@ if not os.path.exists(output_dir):
 # Generate images for a sample batch after training
 with torch.no_grad():
     for batch in data_loader:  # Using the first batch for testing
-        batch = batch.cpu()
+        batch = batch.cuda()
 
         # Generate images for 'lion' and 'penguin' style
         output_lion = model(batch, style='lion')

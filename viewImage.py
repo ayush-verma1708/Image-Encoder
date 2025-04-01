@@ -1,5 +1,14 @@
+import matplotlib.pyplot as plt
 from PIL import Image
 
-# Load and display the original image
-original_image = Image.open("generated_images/lion_output.png")  # Replace with the actual path of your image
-original_image.show()  # This will open the image in the default image viewer
+# Function to display an image
+def display_image(image_path):
+    img = Image.open(image_path)
+    plt.imshow(img)
+    plt.title(f"Generated Image: {image_path}")
+    plt.axis('off')  # Turn off axes for a cleaner look
+    plt.show()
+
+# Display generated images
+display_image("generated_images/lion_output.png")
+display_image("generated_images/penguin_output.png")
