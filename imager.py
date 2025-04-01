@@ -123,7 +123,7 @@ if not os.path.exists(output_dir):
 # Generate images for a sample batch after training
 with torch.no_grad():
     for batch in data_loader:  # Using the first batch for testing
-        batch = batch.cuda()
+        batch = batch.cpu()
 
         # Generate images for 'lion' and 'penguin' style
         output_lion = model(batch, style='lion')
